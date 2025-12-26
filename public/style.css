@@ -1,0 +1,78 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  background: black;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
+
+/* ===================== */
+/* GALERÍA */
+/* ===================== */
+
+.gallery-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#viewer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* CONTENEDOR FOTO */
+#photo-container {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: 85vw;
+  max-height: 85vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* MENSAJE VACÍO */
+#empty-message {
+  color: white;
+  font-size: 4rem;
+  text-align: center;
+  display: none;
+}
+
+/* FOTO */
+#photo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity 1s ease-in-out;
+}
+
+/* MARCO */
+#frame {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  #empty-message {
+    font-size: 2rem;
+  }
+
+  #photo-container {
+    max-width: 95vw;
+    max-height: 90vh;
+  }
+}

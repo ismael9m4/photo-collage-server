@@ -1,0 +1,26 @@
+# Node
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Entorno
+.env
+
+# Subidas de usuarios (NO subir a GitHub)
+uploads/
+uploads/*
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Build / cache
+.cache/

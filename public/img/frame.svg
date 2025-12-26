@@ -1,0 +1,43 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700">
+
+  <!-- Definición de gradiente dorado -->
+  <defs>
+    <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff2b0"></stop>
+      <stop offset="30%" stop-color="#e6b65c"></stop>
+      <stop offset="60%" stop-color="#c9972d"></stop>
+      <stop offset="100%" stop-color="#8a5a14"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- Marco exterior -->
+  <rect x="40" y="40" width="1120" height="620" rx="40" ry="40" fill="none" stroke="url(#goldGradient)" stroke-width="26"></rect>
+
+  <!-- Marco interior -->
+  <rect x="110" y="110" width="980" height="480" rx="28" ry="28" fill="none" stroke="url(#goldGradient)" stroke-width="14"></rect>
+
+  <!-- Ornamento superior -->
+  <path d="M350 70
+       C420 10, 780 10, 850 70
+       C820 40, 760 40, 720 70
+       C680 100, 520 100, 480 70
+       C440 40, 380 40, 350 70 Z" fill="url(#goldGradient)"></path>
+
+  <!-- Ornamento inferior -->
+  <path d="M350 630
+       C420 690, 780 690, 850 630
+       C820 660, 760 660, 720 630
+       C680 600, 520 600, 480 630
+       C440 660, 380 660, 350 630 Z" fill="url(#goldGradient)"></path>
+
+  <!-- Ornamentos laterales -->
+  <path d="M70 200
+       C10 260, 10 440, 70 500
+       C40 450, 40 250, 70 200 Z" fill="url(#goldGradient)"></path>
+
+  <path d="M1130 200
+       C1190 260, 1190 440, 1130 500
+       C1160 450, 1160 250, 1130 200 Z" fill="url(#goldGradient)"></path>
+
+</svg>
