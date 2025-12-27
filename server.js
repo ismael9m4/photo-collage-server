@@ -2,33 +2,71 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const http = require("http");
+const multer = require("multer");
 
 const app = express();
 const PORT = 4000;
 
-// 🔎 Mostrar desde dónde se ejecuta Node
 console.log("CWD:", process.cwd());
 
-// 📂 Rutas
+// 📂 Directorios
 const publicDir = path.join(process.cwd(), "public");
 const uploadsDir = path.join(process.cwd(), "uploads");
 
-// 📁 Crear carpeta uploads si no existe
+// 📁 Crear uploads si no existe
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
   console.log("📁 Carpeta uploads creada");
 }
 
-// 🌐 Servir archivos estáticos
+// 🌐 Archivos estáticos
 app.use(express.static(publicDir));
 app.use("/uploads", express.static(uploadsDir));
 
-// 🧪 Ruta de prueba
-app.get("/test", (req, res) => {
-  res.send("Servidor OK");
+// ==============================
+// 📤 CONFIGURAR MULTER
+// ==============================
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, name + ext);
+  }
 });
 
-// 🖼️ API: listar imágenes subidas
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("Solo imágenes"));
+    }
+    cb(null, true);
+  }
+});
+
+// ==============================
+// 📤 RUTA UPLOAD
+// ==============================
+
+app.post("/upload", upload.single("photo"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No se subió ningún archivo");
+  }
+
+  console.log("📸 Imagen subida:", req.file.filename);
+
+  // Volver al upload
+  res.redirect("/");
+});
+
+// ==============================
+// 🖼️ API IMÁGENES
+// ==============================
+
 app.get("/api/images", (req, res) => {
   fs.readdir(uploadsDir, (err, files) => {
     if (err) {
@@ -44,12 +82,27 @@ app.get("/api/images", (req, res) => {
   });
 });
 
-// 🚀 Crear servidor HTTP explícito (evita problemas en Windows)
-const server = http.createServer(app);
+// ==============================
+// 🧪 TEST
+// ==============================
 
-server.listen(PORT, "127.0.0.1", () => {
-  console.log(`🚀 Servidor activo en http://localhost:${PORT}`);
+app.get("/test", (req, res) => {
+  res.send("Servidor OK");
+});
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicDir, "upload.html"));
 });
 
-// 🧷 Mantener proceso vivo en tu entorno
+// ==============================
+// 🚀 SERVER
+// ==============================
+
+const server = http.createServer(app);
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor activo en:
+→ http://localhost:${PORT}
+→ http://IP_DE_TU_PC:${PORT}`);
+});
+
 process.stdin.resume();
