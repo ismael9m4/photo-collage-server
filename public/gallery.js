@@ -1,99 +1,108 @@
 const photo = document.getElementById("photo");
 const frame = document.getElementById("frame");
-const container = document.getElementById("photo-container");
 const emptyMessage = document.getElementById("empty-message");
 
 let images = [];
-let index = 0;
-let timer = null;
+let currentIndex = 0;
+let rotationTimer = null;
 
-const FRAMES = {
-  horizontal: {
-    img: "/img/frame-horizontal.png",
-    padding: "8%"
-  },
-  vertical: {
-    img: "/img/frame-vertical.png",
-    padding: "10%"
-  }
-};
+const ROTATION_TIME = 5000; // 5 segundos
+const REFRESH_TIME = 4000;  // chequear nuevas fotos
 
 // ==============================
 // CARGAR IMÁGENES
 // ==============================
-fetch("/api/images")
-  .then(r => r.json())
-  .then(data => {
-    images = data;
 
-    if (images.length === 0) {
+async function fetchImages() {
+  try {
+    const res = await fetch("/api/images");
+    const data = await res.json();
+
+    if (data.length === 0) {
       emptyMessage.style.display = "block";
+      photo.style.display = "none";
+      frame.style.display = "none";
+      images = [];
       return;
     }
 
     emptyMessage.style.display = "none";
-    showImage(0);
-    startAuto();
-  })
-  .catch(err => {
-    console.error(err);
-    emptyMessage.style.display = "block";
-  });
+    photo.style.display = "block";
+    frame.style.display = "block";
+
+    // Si hay nuevas imágenes
+    if (data.join() !== images.join()) {
+      images = data;
+      if (currentIndex >= images.length) currentIndex = 0;
+      showImage(currentIndex);
+      restartRotation();
+    }
+
+  } catch (err) {
+    console.error("Error actualizando galería:", err);
+  }
+}
 
 // ==============================
 // MOSTRAR IMAGEN
 // ==============================
-function showImage(i) {
+
+function showImage(index) {
+  if (!images.length) return;
+
   photo.style.opacity = 0;
 
   setTimeout(() => {
-    index = i;
-    photo.src = images[index];
-  }, 400);
+    currentIndex = index;
+    photo.src = images[currentIndex];
+  }, 300);
 }
 
 // ==============================
-// CUANDO CARGA LA FOTO
+// ORIENTACIÓN + MARCO
 // ==============================
+
 photo.onload = () => {
   photo.style.opacity = 1;
 
   const isHorizontal = photo.naturalWidth >= photo.naturalHeight;
-  const type = isHorizontal ? "horizontal" : "vertical";
 
-  frame.style.backgroundImage = `url(${FRAMES[type].img})`;
-  container.style.padding = FRAMES[type].padding;
+  frame.style.backgroundImage = isHorizontal
+    ? "url('/img/frame-horizontal.png')"
+    : "url('/img/frame-vertical.png')";
 };
 
 // ==============================
-// AUTO ROTACIÓN
+// ROTACIÓN AUTOMÁTICA
 // ==============================
-function startAuto() {
-  clearInterval(timer);
-  timer = setInterval(next, 5000);
+
+function nextImage() {
+  if (!images.length) return;
+  currentIndex = (currentIndex + 1) % images.length;
+  showImage(currentIndex);
 }
 
-function next() {
-  showImage((index + 1) % images.length);
-}
-
-function prev() {
-  showImage((index - 1 + images.length) % images.length);
+function restartRotation() {
+  clearInterval(rotationTimer);
+  rotationTimer = setInterval(nextImage, ROTATION_TIME);
 }
 
 // ==============================
 // TECLADO
 // ==============================
+
 document.addEventListener("keydown", e => {
-  if (!images.length) return;
-
-  if (e.key === "ArrowRight") {
-    next();
-    startAuto();
-  }
-
+  if (e.key === "ArrowRight") nextImage();
   if (e.key === "ArrowLeft") {
-    prev();
-    startAuto();
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    showImage(currentIndex);
   }
 });
+
+// ==============================
+// INICIO
+// ==============================
+
+fetchImages();
+restartRotation();
+setInterval(fetchImages, REFRESH_TIME);
